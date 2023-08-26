@@ -26,7 +26,7 @@ function App() {
           </button>
           <div className="App-title">
             CONTRACT:
-            <p>hdjbnhjbdvhjsdbvhjbfewbui3hy7823fh8712ydyhhdfuiefh</p>
+            <p></p>
           </div>
         </div>
       </div>
