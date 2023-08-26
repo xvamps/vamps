@@ -10,20 +10,12 @@
   display: flex;
 }
 
-.section-3 {
-  background-color: blue;
-}
-
-.section-4 {
-  background-color: #d0d0d0;
-}
-
-.section-5 {
-  color: green;
+.section-2 {
+  height: 91vh;
 }
 
 .App-logo {
-  height: 99vmin;
+  height: 98%;
   pointer-events: none;
 }
 
@@ -33,7 +25,12 @@
   color: white;
 }
 
+.App-title p {
+  margin: 0;
+}
+
 .App-header-text {
+  font-size: 40px;
   font-family: "Fixedsys 62", sans-serif;
 }
 
@@ -47,7 +44,7 @@
   background-size: 200% auto;
   border-radius: 10px;
   border: none;
-  width: 18rem;
+  width: 15.5rem;
   padding: 0.75rem;
   cursor: pointer;
   display: inline-block;
@@ -100,9 +97,11 @@
 }
 
 .App-title {
-  font-size: 40px;
+  font-size: 25px;
   font-family: "Charlemagne Std", sans-serif;
   justify-content: center;
+  letter-spacing: -2px;
+  color: #4c4c4c;
 }
 
 .App-title .App-text-with-icon {
@@ -132,14 +131,13 @@
 }
 
 .App-img-center {
-  height: 21rem;
-  width: 23rem;
+  height: 20.5rem;
+  width: 22.5rem;
 }
 
 .App-img-center img,
 .App-img-center-smaller img {
-  height: inherit;
-  width: fit-content;
+  height: 100%;
 }
 
 .App-img-center-smaller {
@@ -179,6 +177,81 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.App-max-width-smaller {
+  max-width: 45%;
+}
+
+.App-max-width {
+  max-width: 40%;
+}
+
+.App-gradient-button-smaller {
+  width: 12.75rem;
+  font-size: 27px;
+  margin: 0 2.5rem;
+}
+
+.App-padding {
+  padding: 0 10rem;
+}
+
+.section-last {
+  margin-top: -8rem;
+}
+
+@media only screen and (max-width: 600px) {
+  .section,
+  .section-2 {
+    overflow-y: auto;
+    height: auto;
+    display: block;
+  }
+
+  .App-title {
+    width: 100%;
+    margin-top: 3rem;
+  }
+
+  .App-title p {
+    margin: 0;
+    text-wrap: wrap;
+    word-wrap: break-word;
+  }
+
+  .section-last {
+    margin-top: -4rem;
+  }
+
+  .App-img-center {
+    height: 13.5rem;
+    width: 15.5rem;
+  }
+
+  .App-padding {
+    padding: 0;
+  }
+
+  .App-gradient-button-smaller {
+    font-size: 12px;
+    width: 4rem;
+    padding: 0.25rem;
+    margin: 10px;
+  }
+
+  .App-max-width-smaller {
+    max-width: 66%;
+  }
+
+  .App-logo {
+    width: 100%;
+    height: auto;
+  }
+
+  .mobile-button {
+    margin-top: 3rem;
+  }
 }
 
 @keyframes App-logo-spin {
