@@ -179,18 +179,15 @@
   color: #61dafb;
 }
 
+.App-max-width,
 .App-max-width-smaller {
-  max-width: 45%;
-}
-
-.App-max-width {
-  max-width: 40%;
+  max-width: 25rem;
 }
 
 .App-gradient-button-smaller {
-  width: 12.75rem;
-  font-size: 27px;
-  margin: 0 2.5rem;
+  width: 10.75rem;
+  font-size: 25px;
+  margin: 5rem 1.5rem 0 1.5rem;
 }
 
 .App-padding {
@@ -240,8 +237,9 @@
     margin: 10px;
   }
 
-  .App-max-width-smaller {
-    max-width: 66%;
+  .App-max-width-smaller,
+  .App-max-width {
+    max-width: 38%;
   }
 
   .App-logo {
