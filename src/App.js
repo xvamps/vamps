@@ -10,6 +10,14 @@ import s61 from "./img/S61.png";
 import s62 from "./img/S62.png";
 import image from "./img/vamps.gif";
 
+const State = {
+  None: 0,
+  Approving: 1,
+  Approved: 2,
+  Drawing: 3,
+  Drawn: 4,
+};
+
 function App() {
   const [connected, setConnected] = useState(false);
   const [provider, setProvider] = useState();
@@ -21,8 +29,7 @@ function App() {
   const [tokenId, setTokenid] = useState(0);
   const [bonus, setBonus] = useState(0);
   const [drawnImage, setDrawnImage] = useState("");
-  const [drawing, setDrawing] = useState(false);
-
+  const [state, setState] = useState(0);
   useEffect(() => {
     const updateData = async () => {
       if (provider && vamps) {
@@ -33,7 +40,7 @@ function App() {
         );
         const limitReached = mintedAmount >= 3;
         setMintedAmout(minted);
-        setLimitReached(limitReached);
+        // setLimitReached(limitReached);
       }
     };
     updateData();
@@ -45,13 +52,14 @@ function App() {
         await window.ethereum.request({ method: "eth_requestAccounts" });
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const vampsAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // Replace with your actual contract address
+        const vampsAddress = "0xdf15A95D4Df7d1F7231eddF18D41e198F94d46A6"; // Replace with your actual contract address
         const vamps = new ethers.Contract(
           vampsAddress,
           Vamps.abi,
           provider.getSigner()
         );
-        const pXenTokenAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Replace with your actual contract address
+
+        const pXenTokenAddress = "0x1886aCdd0FBA26B2EE1D0F7a8DA1d8fb489F60F1"; // Replace with your actual contract address
 
         const pXenToken = new ethers.Contract(
           pXenTokenAddress,
@@ -127,19 +135,38 @@ function App() {
 
   const mint = async () => {
     try {
+      const signerAddress = await await provider.getSigner().getAddress();
+      const filter = {
+        address: pXenToken.address,
+        topics: [
+          ethers.utils.id("Transfer(address,address,uint256)"),
+          ethers.utils.hexZeroPad(ethers.constants.AddressZero, 32),
+          ethers.utils.hexZeroPad(signerAddress, 32),
+        ],
+      };
+      vamps.once(filter, (from, to, id) => {
+        if (from === ethers.constants.AddressZero && to === signerAddress) {
+          console.log("In");
+          getMetadata(id);
+          setTokenid(id.toNumber());
+          setBonus(getBonus(id.toNumber()));
+          setState(4);
+        }
+        console.log("Out");
+      });
+
       const price = await vamps.getPrice();
       const toBurn = await vamps.getPxenToBurnAmount();
-      console.log(price.toString());
-      console.log(toBurn.toString());
-      console.log(vamps.address);
-      const approveTx = await pXenToken.approve(vamps.address, toBurn);
 
-      setDrawing(true);
+      const approveTx = await pXenToken.approve(vamps.address, toBurn);
+      setState(1);
+
       openPopup();
       await approveTx.wait(1);
+      setState(2);
 
       const mintTx = await vamps.mint({ value: price });
-
+      setState(3);
       await mintTx.wait(1);
 
       const minted = (await vamps.getCounter()).toNumber();
@@ -147,18 +174,37 @@ function App() {
         provider.getSigner().getAddress()
       );
       const limitReached = mintedAmount >= 3;
-      setLimitReached(limitReached);
+      // setLimitReached(limitReached);
       setMintedAmout(minted);
 
-      vamps.once("Transfer", (from, to, id) => {
-        getMetadata(id);
-        setTokenid(id.toNumber());
-        setBonus(getBonus(id.toNumber()));
-        setDrawing(false);
-      });
+      console.log("Minting finished");
+
+      console.log("Juz po evencie");
     } catch (e) {
       console.log("Something went wrong");
     }
+  };
+
+  const popupContent = () => {
+    if (state === State.Approving) return <div>Aproval in progress...</div>;
+    else if (state === State.Approved)
+      return <div>Tokens approved. Please mint.</div>;
+    else if (state === State.Drawing) return <div>Minting in progress..</div>;
+    else if (state === State.Drawn)
+      return (
+        <>
+          <h2>#{tokenId}</h2>
+          <img height={"200px"} src={drawnImage} alt="A Blue Circle" />
+          <p>Yield Bonus: {bonus}</p>
+          <button
+            className="App-gradient-button App-gradient-button-smaller"
+            onClick={closePopup}
+          >
+            Close
+          </button>
+        </>
+      );
+    else return <></>;
   };
 
   return (
@@ -245,23 +291,7 @@ function App() {
       </div>
       {popupVisible && (
         <div className="popup-overlay">
-          <div className="popup">
-            {drawing ? (
-              <div>Wait</div>
-            ) : (
-              <>
-                <h2>#{tokenId}</h2>
-                <img height={"200px"} src={drawnImage} alt="A Blue Circle" />
-                <p>Yield Bonus: {bonus}</p>
-                <button
-                  className="App-gradient-button App-gradient-button-smaller"
-                  onClick={closePopup}
-                >
-                  Close
-                </button>
-              </>
-            )}
-          </div>
+          <div className="popup">{popupContent()}</div>
         </div>
       )}
     </div>
