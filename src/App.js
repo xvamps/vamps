@@ -34,6 +34,14 @@ function App() {
 
   useEffect(() => {
     const updateData = async () => {
+      // const rpcProvider = new ethers.providers.JsonRpcProvider(
+      //   "https://rpc.pulsechain.com"
+      // );
+      // const vampsAddress = "0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2"; // Replace with your actual contract address
+      // const vamps = new ethers.Contract(vampsAddress, Vamps.abi, rpcProvider);
+      // const started = await vamps.isStarted();
+
+      // console.log(started, " Test");
       if (provider && vamps) {
         const minted = (await vamps.getCounter()).toNumber();
         const mintedAmount = await vamps.getMintedAmoutByMinter(
@@ -268,7 +276,7 @@ function App() {
             >
               {limitReached ? "Limit reached " : "Mint"}
             </button>
-          ) : mintedAmount >= 10 ? (
+          ) : mintedAmount >= 1000 ? (
             <button
               className={`App-gradient-button mobile-button disabled`}
               disabled
