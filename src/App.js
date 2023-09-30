@@ -8,8 +8,8 @@ import s4 from "./img/S4.png";
 import s5 from "./img/S5.png";
 import s61 from "./img/S61.png";
 import s62 from "./img/S62.png";
+import references from "./img/references.json";
 import image from "./img/vamps.gif";
-
 const State = {
   None: 0,
   Approving: 1,
@@ -30,17 +30,19 @@ function App() {
   const [bonus, setBonus] = useState(0);
   const [drawnImage, setDrawnImage] = useState("");
   const [state, setState] = useState(0);
+  const [started, setStarted] = useState(false);
+
   useEffect(() => {
     const updateData = async () => {
       if (provider && vamps) {
         const minted = (await vamps.getCounter()).toNumber();
-
+        console.log(await provider.getSigner().getAddress());
         const mintedAmount = await vamps.getMintedAmoutByMinter(
           provider.getSigner().getAddress()
         );
         const limitReached = mintedAmount >= 3;
         setMintedAmout(minted);
-        // setLimitReached(limitReached);
+        setLimitReached(limitReached);
       }
     };
     updateData();
@@ -51,15 +53,25 @@ function App() {
       if (window.ethereum) {
         await window.ethereum.request({ method: "eth_requestAccounts" });
 
+        const currentChainId = await window.ethereum.request({
+          method: "eth_chainId",
+        });
+        console.log(currentChainId);
+        if (currentChainId !== "0xaa36a7") {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xaa36a7" }],
+          });
+        }
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const vampsAddress = "0xdf15A95D4Df7d1F7231eddF18D41e198F94d46A6"; // Replace with your actual contract address
+        const vampsAddress = "0xb15D52bE4a2e06be24F9D3319D8EfBa9500AB5c2"; // Replace with your actual contract address
         const vamps = new ethers.Contract(
           vampsAddress,
           Vamps.abi,
           provider.getSigner()
         );
 
-        const pXenTokenAddress = "0x1886aCdd0FBA26B2EE1D0F7a8DA1d8fb489F60F1"; // Replace with your actual contract address
+        const pXenTokenAddress = "0xd707acaB8e9BB55014924526ED0486d37e55F1fD"; // Replace with your actual contract address
 
         const pXenToken = new ethers.Contract(
           pXenTokenAddress,
@@ -67,9 +79,14 @@ function App() {
           provider.getSigner()
         );
 
+        const started = await vamps.isStarted();
+
+        console.log(started);
+
         setProvider(provider);
         setVamps(vamps);
         setPXenToken(pXenToken);
+        setStarted(started);
         setConnected(true);
       } else {
         console.error("Metamask is not installed");
@@ -120,16 +137,18 @@ function App() {
   };
 
   const getMetadata = async (id) => {
-    const response = await fetch(
-      "https://ipfs.io/ipfs/QmWMnyAMSsVhWmsBP1jkamm39RMQmbTaBCp4q24nUAdcui/2",
-      {
-        method: "GET",
-      }
-    );
-    const metadata = await response.json();
-    const imageCID = metadata.image.substring(7);
-    const imageUrl = `https://ipfs.io/ipfs/${imageCID}`;
+    // const response = await fetch(
+    //   `https://ipfs.io/ipfs/QmNPkjMWg1R2g4W4GZtPp4cwRgkiXt2BsMZoFffqLv8WAf/${id}`,
+    //   {
+    //     method: "GET",
+    //   }
+    // );
+    // const metadata = await response.json();
+    // const imageCID = metadata.image.substring(7);
+    // const imageUrl = `https://ipfs.io/ipfs/${imageCID}`;
+    const imageUrl = references[id];
 
+    console.log(imageUrl);
     setDrawnImage(imageUrl);
   };
 
@@ -146,26 +165,27 @@ function App() {
       };
       vamps.once(filter, (from, to, id) => {
         if (from === ethers.constants.AddressZero && to === signerAddress) {
-          console.log("In");
           getMetadata(id);
           setTokenid(id.toNumber());
           setBonus(getBonus(id.toNumber()));
           setState(4);
         }
-        console.log("Out");
       });
 
       const price = await vamps.getPrice();
-      const toBurn = await vamps.getPxenToBurnAmount();
 
+      console.log("Cena ", price);
+      const toBurn = await vamps.getPxenToBurnAmount();
+      console.log(toBurn.toString());
       const approveTx = await pXenToken.approve(vamps.address, toBurn);
       setState(1);
 
       openPopup();
       await approveTx.wait(1);
       setState(2);
-
+      console.log("Approved");
       const mintTx = await vamps.mint({ value: price });
+      console.log("minted");
       setState(3);
       await mintTx.wait(1);
 
@@ -174,25 +194,44 @@ function App() {
         provider.getSigner().getAddress()
       );
       const limitReached = mintedAmount >= 3;
-      // setLimitReached(limitReached);
+      setLimitReached(limitReached);
       setMintedAmout(minted);
-
-      console.log("Minting finished");
-
-      console.log("Juz po evencie");
     } catch (e) {
       console.log("Something went wrong");
     }
   };
 
   const popupContent = () => {
-    if (state === State.Approving) return <div>Aproval in progress...</div>;
+    if (state === State.Approving)
+      return (
+        <div>
+          <div className="lds-ripple">
+            <div></div>
+            <div></div>
+          </div>
+          <p>Approval in progress...</p>
+        </div>
+      );
     else if (state === State.Approved)
-      return <div>Tokens approved. Please mint.</div>;
-    else if (state === State.Drawing) return <div>Minting in progress..</div>;
+      return (
+        <div>
+          <div className="check"></div>
+          <p>Tokens approved. Please mint.</p>
+        </div>
+      );
+    else if (state === State.Drawing)
+      return (
+        <div>
+          <div className="lds-ripple">
+            <div></div>
+            <div></div>
+          </div>
+          <p>Minting in progress...</p>
+        </div>
+      );
     else if (state === State.Drawn)
       return (
-        <>
+        <div>
           <h2>#{tokenId}</h2>
           <img height={"200px"} src={drawnImage} alt="A Blue Circle" />
           <p>Yield Bonus: {bonus}</p>
@@ -202,13 +241,14 @@ function App() {
           >
             Close
           </button>
-        </>
+        </div>
       );
-    else return <></>;
+    else return <div></div>;
   };
 
   return (
     <div className="App">
+      <button onClick={getMetadata}>Click</button>
       <div className="section">
         <header className="App-header">
           <img src={s1} className="App-logo" alt="logo" />
@@ -227,7 +267,7 @@ function App() {
             >
               Connect
             </button>
-          ) : (
+          ) : started && mintedAmount < 10 ? (
             <button
               className={`App-gradient-button mobile-button ${
                 limitReached ? "disabled" : ""
@@ -237,10 +277,21 @@ function App() {
             >
               {limitReached ? "Limit reached " : "Mint"}
             </button>
+          ) : mintedAmount >= 10 ? (
+            <button
+              className={`App-gradient-button mobile-button disabled`}
+              disabled
+            >
+              Mintig finished
+            </button>
+          ) : (
+            <button className={`App-gradient-button mobile-button`}>
+              Blooding soon...
+            </button>
           )}
           <div className="App-title">
             CONTRACT:
-            <p></p>
+            <p>0x834C574b71c75df7A86aaE0955Cc64B5c55fF184</p>
           </div>
         </div>
       </div>
