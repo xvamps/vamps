@@ -169,7 +169,6 @@ function App() {
 
       const price = await vamps.getPrice();
 
-
       const toBurn = await vamps.getPxenToBurnAmount();
 
       const approveTx = await pXenToken.approve(vamps.address, toBurn);
@@ -283,7 +282,7 @@ function App() {
           )}
           <div className="App-title">
             CONTRACT:
-            <p>0x834C574b71c75df7A86aaE0955Cc64B5c55fF184</p>
+            <p>0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2</p>
           </div>
         </div>
       </div>
