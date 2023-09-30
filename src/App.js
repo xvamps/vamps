@@ -266,7 +266,7 @@ function App() {
             >
               Connect
             </button>
-          ) : started && limitReached ? (
+          ) : started && mintedAmount < 1000 ? (
             <button
               className={`App-gradient-button mobile-button ${
                 limitReached ? "disabled" : ""
