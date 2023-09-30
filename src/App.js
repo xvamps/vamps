@@ -273,7 +273,7 @@ function App() {
               className={`App-gradient-button mobile-button disabled`}
               disabled
             >
-              Mintig finished
+              Minting finished
             </button>
           ) : (
             <button className={`App-gradient-button mobile-button`}>
