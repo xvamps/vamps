@@ -55,21 +55,21 @@ function App() {
         const currentChainId = await window.ethereum.request({
           method: "eth_chainId",
         });
-        if (currentChainId !== "0xaa36a7") {
+        if (currentChainId !== "0x171") {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0xaa36a7" }],
+            params: [{ chainId: "0x171" }],
           });
         }
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const vampsAddress = "0xb15D52bE4a2e06be24F9D3319D8EfBa9500AB5c2"; // Replace with your actual contract address
+        const vampsAddress = "0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2"; // Replace with your actual contract address
         const vamps = new ethers.Contract(
           vampsAddress,
           Vamps.abi,
           provider.getSigner()
         );
 
-        const pXenTokenAddress = "0xd707acaB8e9BB55014924526ED0486d37e55F1fD"; // Replace with your actual contract address
+        const pXenTokenAddress = "0x8a7FDcA264e87b6da72D000f22186B4403081A2a"; // Replace with your actual contract address
 
         const pXenToken = new ethers.Contract(
           pXenTokenAddress,
