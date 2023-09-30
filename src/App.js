@@ -36,7 +36,6 @@ function App() {
     const updateData = async () => {
       if (provider && vamps) {
         const minted = (await vamps.getCounter()).toNumber();
-        console.log(await provider.getSigner().getAddress());
         const mintedAmount = await vamps.getMintedAmoutByMinter(
           provider.getSigner().getAddress()
         );
@@ -56,7 +55,6 @@ function App() {
         const currentChainId = await window.ethereum.request({
           method: "eth_chainId",
         });
-        console.log(currentChainId);
         if (currentChainId !== "0xaa36a7") {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
@@ -80,8 +78,6 @@ function App() {
         );
 
         const started = await vamps.isStarted();
-
-        console.log(started);
 
         setProvider(provider);
         setVamps(vamps);
@@ -148,7 +144,6 @@ function App() {
     // const imageUrl = `https://ipfs.io/ipfs/${imageCID}`;
     const imageUrl = references[id];
 
-    console.log(imageUrl);
     setDrawnImage(imageUrl);
   };
 
@@ -174,18 +169,16 @@ function App() {
 
       const price = await vamps.getPrice();
 
-      console.log("Cena ", price);
+
       const toBurn = await vamps.getPxenToBurnAmount();
-      console.log(toBurn.toString());
+
       const approveTx = await pXenToken.approve(vamps.address, toBurn);
       setState(1);
 
       openPopup();
       await approveTx.wait(1);
       setState(2);
-      console.log("Approved");
       const mintTx = await vamps.mint({ value: price });
-      console.log("minted");
       setState(3);
       await mintTx.wait(1);
 
@@ -248,7 +241,6 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={getMetadata}>Click</button>
       <div className="section">
         <header className="App-header">
           <img src={s1} className="App-logo" alt="logo" />
