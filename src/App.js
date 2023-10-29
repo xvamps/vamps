@@ -193,7 +193,7 @@ function App() {
       const mintedAmount = await vamps.getMintedAmoutByMinter(
         provider.getSigner().getAddress()
       );
-      const limitReached = mintedAmount >= 3;
+      const limitReached = mintedAmount >= 10;
       setLimitReached(limitReached);
       setMintedAmout(minted);
     } catch (e) {
