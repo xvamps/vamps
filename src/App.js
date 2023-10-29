@@ -37,7 +37,7 @@ function App() {
       const rpcProvider = new ethers.providers.JsonRpcProvider(
         "https://rpc.pulsechain.com"
       );
-      const vampsAddress = "0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2"; // Replace with your actual contract address
+      const vampsAddress = "0x458E50D2f516B82284C49daf9932587909693445"; // Replace with your actual contract address
       const vamps = new ethers.Contract(vampsAddress, Vamps.abi, rpcProvider);
 
       const minted = (await vamps.getCounter()).toNumber();
@@ -70,7 +70,7 @@ function App() {
           });
         }
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const vampsAddress = "0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2"; // Replace with your actual contract address
+        const vampsAddress = "0x458E50D2f516B82284C49daf9932587909693445"; // Replace with your actual contract address
         const vamps = new ethers.Contract(
           vampsAddress,
           Vamps.abi,
@@ -290,7 +290,7 @@ function App() {
           )}
           <div className="App-title">
             CONTRACT:
-            <p>0x946d8EDd46CB8B4D704D111143AbE1fa40B4e1B2</p>
+            <p>0x458E50D2f516B82284C49daf9932587909693445</p>
           </div>
         </div>
       </div>
